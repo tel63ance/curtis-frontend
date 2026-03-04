@@ -1,17 +1,18 @@
 {
   "expo": {
-    "name": "CURTIS-FRONTEND",
+    "name": "Nairobi Botanica",
     "slug": "CURTIS-FRONTEND",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "curtisfrontend",
+    "scheme": "nairobibotanica",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.victortele.nairobibotanica",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -38,11 +39,19 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "63a49e9d-70b5-4ddd-9907-8995b8d4d2f3"
+      }
+    },
+    "owner": "manu_el"
   }
 }
