@@ -298,15 +298,7 @@ export default function Login() {
                       marginRight: 10,
                     }}
                   />
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: BotanicaColors.barkBrown,
-                      fontStyle: "italic",
-                    }}
-                  >
-                    Where Nature Meets Commerce
-                  </Text>
+
                   <View
                     style={{
                       width: 30,
@@ -382,7 +374,7 @@ export default function Login() {
                             fontSize: 16,
                             color: BotanicaColors.barkBrown,
                           }}
-                          placeholder="your.email@example.com"
+                          placeholder="Email Address"
                           placeholderTextColor={BotanicaColors.stoneGray}
                           value={values.email}
                           onChangeText={handleChange("email")}
@@ -527,7 +519,7 @@ export default function Login() {
                               letterSpacing: 1,
                             }}
                           >
-                            ENTER THE GARDEN
+                            Log In
                           </Text>
                         </LinearGradient>
                       </TouchableOpacity>
@@ -604,7 +596,7 @@ export default function Login() {
                     fontStyle: "italic",
                   }}
                 >
-                  © 2024 Nairobi Botanica · Cultivating Excellence
+                  © 2026 Nairobi Botanica ·
                 </Text>
                 <View
                   style={{

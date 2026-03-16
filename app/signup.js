@@ -47,6 +47,18 @@ const BotanicaColors = {
   success: "#5F8B6F",
 };
 
+// Email validation regex
+const validateEmail = (email) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+};
+
+// Phone validation (Kenyan format - can be adjusted)
+const validatePhone = (phone) => {
+  const re = /^(\+254|0)[7|1][0-9]{8}$/;
+  return re.test(phone);
+};
+
 const Signup = () => {
   const [hidePassword, setHidePassword] = useState(true);
   const [hideConfirmPassword, setHideConfirmPassword] = useState(true);
@@ -341,23 +353,52 @@ const Signup = () => {
               password: "",
               confirmPassword: "",
             }}
-            onSubmit={(values, { setSubmitting }) => {
-              if (
-                !values.name ||
-                !values.email ||
-                !values.phone ||
-                !values.password ||
-                !values.confirmPassword ||
-                !dob
-              ) {
-                handleMessage("Please fill in all fields");
-                setSubmitting(false);
-              } else if (values.password !== values.confirmPassword) {
-                handleMessage("Passwords do not match");
-                setSubmitting(false);
-              } else {
-                handleSignup(values, setSubmitting);
+            validate={(values) => {
+              const errors = {};
+
+              // Validate Name
+              if (!values.name.trim()) {
+                errors.name = "Name is required";
               }
+
+              // Validate Email
+              if (!values.email) {
+                errors.email = "Email is required";
+              } else if (!validateEmail(values.email)) {
+                errors.email = "Please enter a valid email address";
+              }
+
+              // Validate Phone
+              if (!values.phone) {
+                errors.phone = "Phone number is required";
+              } else if (!validatePhone(values.phone)) {
+                errors.phone =
+                  "Please enter a valid Kenyan phone number (e.g., 0712345678 or +254712345678)";
+              }
+
+              // Validate Password (only length)
+              if (!values.password) {
+                errors.password = "Password is required";
+              } else if (values.password.length < 6) {
+                errors.password = "Password must be at least 6 characters long";
+              }
+
+              // Validate Confirm Password
+              if (!values.confirmPassword) {
+                errors.confirmPassword = "Please confirm your password";
+              } else if (values.password !== values.confirmPassword) {
+                errors.confirmPassword = "Passwords do not match";
+              }
+
+              // Validate Date of Birth
+              if (!dob) {
+                errors.dob = "Date of birth is required";
+              }
+
+              return errors;
+            }}
+            onSubmit={(values, { setSubmitting }) => {
+              handleSignup(values, setSubmitting);
             }}
           >
             {({
@@ -365,6 +406,8 @@ const Signup = () => {
               handleBlur,
               handleSubmit,
               values,
+              errors,
+              touched,
               isSubmitting,
             }) => (
               <View style={{ width: "100%" }}>
@@ -378,6 +421,7 @@ const Signup = () => {
                   value={values.name}
                   icon="person"
                   botanicaColors={BotanicaColors}
+                  error={touched.name && errors.name}
                 />
 
                 {/* Email Field */}
@@ -389,21 +433,23 @@ const Signup = () => {
                   onBlur={handleBlur("email")}
                   value={values.email}
                   keyboardType="email-address"
+                  autoCapitalize="none"
                   icon="mail"
                   botanicaColors={BotanicaColors}
+                  error={touched.email && errors.email}
                 />
 
                 {/* Phone Field */}
                 <MyTextInput
                   label="Phone Number"
                   placeholder="Enter your Phone Number"
-                  placeholderTextColor={BotanicaColors.stoneGray}
                   onChangeText={handleChange("phone")}
                   onBlur={handleBlur("phone")}
                   value={values.phone}
                   keyboardType="phone-pad"
                   icon="device-mobile"
                   botanicaColors={BotanicaColors}
+                  error={touched.phone && errors.phone}
                 />
 
                 {/* Date of Birth Field */}
@@ -417,11 +463,12 @@ const Signup = () => {
                   isDate={true}
                   showDatePicker={showDatePicker}
                   botanicaColors={BotanicaColors}
+                  error={touched.dob && errors.dob}
                 />
 
                 {/* Password Field */}
                 <MyTextInput
-                  label="Password"
+                  label="Password (min. 6 characters)"
                   placeholder="********"
                   placeholderTextColor={BotanicaColors.stoneGray}
                   onChangeText={handleChange("password")}
@@ -433,6 +480,7 @@ const Signup = () => {
                   hidePassword={hidePassword}
                   setHidePassword={setHidePassword}
                   botanicaColors={BotanicaColors}
+                  error={touched.password && errors.password}
                 />
 
                 {/* Confirm Password Field */}
@@ -449,6 +497,7 @@ const Signup = () => {
                   hidePassword={hideConfirmPassword}
                   setHidePassword={setHideConfirmPassword}
                   botanicaColors={BotanicaColors}
+                  error={touched.confirmPassword && errors.confirmPassword}
                 />
 
                 {/* Message Box */}
@@ -521,7 +570,7 @@ const Signup = () => {
                           letterSpacing: 1,
                         }}
                       >
-                        PLANT YOUR SEED
+                        Register Now
                       </Text>
                     </LinearGradient>
                   </TouchableOpacity>
@@ -604,7 +653,7 @@ const Signup = () => {
                         textDecorationColor: BotanicaColors.forestGreen,
                       }}
                     >
-                      Return to the Garden
+                      Log In
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -659,7 +708,7 @@ const Signup = () => {
   );
 };
 
-// 👁️ Custom input field with Botanica styling
+// 👁️ Custom input field with Botanica styling and error display
 const MyTextInput = ({
   label,
   icon,
@@ -669,6 +718,7 @@ const MyTextInput = ({
   isDate,
   showDatePicker,
   botanicaColors,
+  error,
   ...props
 }) => (
   <View style={{ marginBottom: 16 }}>
@@ -697,7 +747,7 @@ const MyTextInput = ({
         backgroundColor: "rgba(138, 169, 155, 0.08)",
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: botanicaColors.sandBeige,
+        borderColor: error ? botanicaColors.error : botanicaColors.sandBeige,
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: 12,
@@ -747,6 +797,19 @@ const MyTextInput = ({
         </TouchableOpacity>
       )}
     </View>
+
+    {error && (
+      <Text
+        style={{
+          color: botanicaColors.error,
+          fontSize: 12,
+          marginTop: 4,
+          marginLeft: 8,
+        }}
+      >
+        {error}
+      </Text>
+    )}
   </View>
 );
 

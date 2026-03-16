@@ -54,6 +54,7 @@ const Payments = () => {
   const [loadingPayments, setLoadingPayments] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [createdPaymentId, setCreatedPaymentId] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
 
   // Payment form state - MATCHING BACKEND REQUIREMENTS
   const [paymentForm, setPaymentForm] = useState({
@@ -61,6 +62,36 @@ const Payments = () => {
     reference_code: "",
     phoneNumber: "", // For M-Pesa only, not sent to backend
   });
+
+  // Reference code validation rules by payment method
+  const referenceCodeRules = useMemo(
+    () => ({
+      Mpesa: {
+        pattern: /^[A-Z0-9]+$/,
+        minLength: 8,
+        maxLength: 12,
+        message:
+          "M-Pesa code must be 8-12 characters, all caps letters and numbers only",
+        example: "",
+      },
+      "Airtel Money": {
+        pattern: /^[A-Z0-9]+$/,
+        minLength: 8,
+        maxLength: 12,
+        message:
+          "Airtel Money code must be 8-12 characters, all caps letters and numbers only",
+        example: "",
+      },
+      "Bank Transfer": {
+        pattern: /^[A-Za-z0-9-]+$/,
+        minLength: 5,
+        maxLength: 30,
+        message: "Bank reference can contain letters, numbers, and hyphens",
+        example: "",
+      },
+    }),
+    [],
+  );
 
   // Bank transfer details - memoized to prevent unnecessary re-renders
   const bankDetails = useMemo(
@@ -143,6 +174,16 @@ const Payments = () => {
     }
   }, [initialAmount, selectedBooking?.booking_fee]);
 
+  // Auto-disable input when reference code reaches max length
+  useEffect(() => {
+    if (selectedPaymentMethod && referenceInputRef.current) {
+      const rules = referenceCodeRules[selectedPaymentMethod];
+      if (rules && paymentForm.reference_code.length >= rules.maxLength) {
+        referenceInputRef.current.blur();
+      }
+    }
+  }, [paymentForm.reference_code, selectedPaymentMethod, referenceCodeRules]);
+
   const loadUserData = async () => {
     try {
       const user = await AsyncStorage.getItem("user");
@@ -202,6 +243,7 @@ const Payments = () => {
     (method, booking = null) => {
       setSelectedPaymentMethod(method.id);
       setSelectedBooking(booking);
+      setValidationErrors({});
 
       let amountToPay = "";
       if (booking?.booking_fee) {
@@ -221,10 +263,29 @@ const Payments = () => {
     [initialAmount],
   );
 
+  const validateReferenceCode = useCallback(
+    (code, method) => {
+      if (!method || !code) return false;
+
+      const rules = referenceCodeRules[method];
+      if (!rules) return true; // No validation rules for this method
+
+      // Check length
+      if (code.length < rules.minLength || code.length > rules.maxLength) {
+        return false;
+      }
+
+      // Check pattern
+      return rules.pattern.test(code);
+    },
+    [referenceCodeRules],
+  );
+
   const validatePaymentForm = useCallback(() => {
+    const errors = {};
+
     if (!paymentForm.amount || parseFloat(paymentForm.amount) <= 0) {
-      Alert.alert("Error", "Please enter a valid amount");
-      return false;
+      errors.amount = "Please enter a valid amount";
     }
 
     if (
@@ -232,33 +293,57 @@ const Payments = () => {
       selectedPaymentMethod === "Airtel Money"
     ) {
       if (!paymentForm.phoneNumber.trim()) {
-        Alert.alert("Error", "Please enter your phone number");
-        return false;
+        errors.phoneNumber = "Please enter your phone number";
+      } else if (paymentForm.phoneNumber.length < 10) {
+        errors.phoneNumber = "Please enter a valid 10-digit phone number";
       }
-      if (paymentForm.phoneNumber.length < 10) {
-        Alert.alert("Error", "Please enter a valid phone number");
-        return false;
-      }
+
       if (!paymentForm.reference_code.trim()) {
-        Alert.alert("Error", "Please enter the transaction code");
-        return false;
+        errors.reference_code = "Please enter the transaction code";
+      } else if (
+        !validateReferenceCode(
+          paymentForm.reference_code,
+          selectedPaymentMethod,
+        )
+      ) {
+        errors.reference_code =
+          referenceCodeRules[selectedPaymentMethod]?.message;
       }
     } else if (selectedPaymentMethod === "Bank Transfer") {
       if (!paymentForm.reference_code.trim()) {
-        Alert.alert("Error", "Please enter the transaction reference");
-        return false;
+        errors.reference_code = "Please enter the transaction reference";
+      } else if (
+        !validateReferenceCode(
+          paymentForm.reference_code,
+          selectedPaymentMethod,
+        )
+      ) {
+        errors.reference_code =
+          referenceCodeRules[selectedPaymentMethod]?.message;
       }
     }
-    return true;
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   }, [
     paymentForm.amount,
     paymentForm.phoneNumber,
     paymentForm.reference_code,
     selectedPaymentMethod,
+    validateReferenceCode,
+    referenceCodeRules,
   ]);
 
   const handleSubmitPayment = useCallback(async () => {
-    if (!validatePaymentForm()) return;
+    if (!validatePaymentForm()) {
+      // Show warning for incomplete form
+      Alert.alert(
+        "Incomplete Form",
+        "Please fill in all required fields correctly before submitting.",
+        [{ text: "OK" }],
+      );
+      return;
+    }
     if (!userData?.id) {
       Alert.alert("Error", "User not authenticated");
       return;
@@ -290,7 +375,7 @@ const Payments = () => {
         booking_id: finalBookingId,
         payment_method: selectedMethod?.backendValue || selectedPaymentMethod,
         amount: parseFloat(paymentForm.amount),
-        reference_code: paymentForm.reference_code,
+        reference_code: paymentForm.reference_code.toUpperCase(), // Convert to uppercase for M-Pesa/Airtel
         payment_type: payment_type,
       };
 
@@ -317,6 +402,7 @@ const Payments = () => {
           reference_code: "",
           phoneNumber: "",
         });
+        setValidationErrors({});
       } else {
         Alert.alert("Error", data.error || "Failed to process payment");
       }
@@ -387,10 +473,27 @@ const Payments = () => {
   // Memoized form change handlers to prevent recreating on every render
   const handlePhoneChange = useCallback((text) => {
     setPaymentForm((prev) => ({ ...prev, phoneNumber: text }));
+    setValidationErrors((prev) => ({ ...prev, phoneNumber: null }));
   }, []);
 
-  const handleReferenceChange = useCallback((text) => {
-    setPaymentForm((prev) => ({ ...prev, reference_code: text }));
+  const handleReferenceChange = useCallback(
+    (text) => {
+      // For M-Pesa and Airtel Money, automatically convert to uppercase
+      const isMobileMoney =
+        selectedPaymentMethod === "Mpesa" ||
+        selectedPaymentMethod === "Airtel Money";
+
+      const newText = isMobileMoney ? text.toUpperCase() : text;
+
+      setPaymentForm((prev) => ({ ...prev, reference_code: newText }));
+      setValidationErrors((prev) => ({ ...prev, reference_code: null }));
+    },
+    [selectedPaymentMethod],
+  );
+
+  const handleAmountChange = useCallback((text) => {
+    setPaymentForm((prev) => ({ ...prev, amount: text }));
+    setValidationErrors((prev) => ({ ...prev, amount: null }));
   }, []);
 
   const PaymentMethodCard = useCallback(
@@ -491,19 +594,31 @@ const Payments = () => {
   const modalContent = useMemo(() => {
     if (!showPaymentModal) return null;
 
+    const rules = selectedPaymentMethod
+      ? referenceCodeRules[selectedPaymentMethod]
+      : null;
+
     return (
       <Modal
         visible={showPaymentModal}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setShowPaymentModal(false)}
+        onRequestClose={() => {
+          setShowPaymentModal(false);
+          setValidationErrors({});
+        }}
       >
         <TouchableWithoutFeedback onPress={dismissKeyboard}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>{selectedPaymentMethod}</Text>
-                <TouchableOpacity onPress={() => setShowPaymentModal(false)}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowPaymentModal(false);
+                    setValidationErrors({});
+                  }}
+                >
                   <MaterialIcons name="close" size={24} color="#666" />
                 </TouchableOpacity>
               </View>
@@ -575,9 +690,19 @@ const Payments = () => {
                           : "Enter amount"}
                       </Text>
                     </View>
+                    {validationErrors.amount && (
+                      <Text style={styles.errorText}>
+                        {validationErrors.amount}
+                      </Text>
+                    )}
 
                     <Text style={styles.inputLabel}>Phone Number *</Text>
-                    <View style={styles.inputContainer}>
+                    <View
+                      style={[
+                        styles.inputContainer,
+                        validationErrors.phoneNumber && styles.inputError,
+                      ]}
+                    >
                       <MaterialIcons
                         name="phone"
                         size={20}
@@ -587,7 +712,7 @@ const Payments = () => {
                       <TextInput
                         ref={phoneInputRef}
                         style={styles.input}
-                        placeholder="e.g., 0712345678"
+                        placeholder="Enter phone number used for payment"
                         placeholderTextColor="#999"
                         value={paymentForm.phoneNumber}
                         onChangeText={handlePhoneChange}
@@ -595,9 +720,22 @@ const Payments = () => {
                         maxLength={10}
                       />
                     </View>
+                    {validationErrors.phoneNumber && (
+                      <Text style={styles.errorText}>
+                        {validationErrors.phoneNumber}
+                      </Text>
+                    )}
 
-                    <Text style={styles.inputLabel}>Transaction Code *</Text>
-                    <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>
+                      Transaction Code *{" "}
+                      {rules && `(${rules.minLength}-${rules.maxLength} chars)`}
+                    </Text>
+                    <View
+                      style={[
+                        styles.inputContainer,
+                        validationErrors.reference_code && styles.inputError,
+                      ]}
+                    >
                       <MaterialIcons
                         name="receipt"
                         size={20}
@@ -607,15 +745,31 @@ const Payments = () => {
                       <TextInput
                         ref={referenceInputRef}
                         style={styles.input}
-                        placeholder={`Enter ${selectedPaymentMethod} transaction code`}
+                        placeholder={
+                          rules?.example ||
+                          `Enter ${selectedPaymentMethod} transaction code`
+                        }
                         placeholderTextColor="#999"
                         value={paymentForm.reference_code}
                         onChangeText={handleReferenceChange}
+                        maxLength={rules?.maxLength}
+                        autoCapitalize="characters"
                       />
                     </View>
+                    {validationErrors.reference_code && (
+                      <Text style={styles.errorText}>
+                        {validationErrors.reference_code}
+                      </Text>
+                    )}
+                    {rules && (
+                      <Text style={styles.hintText}>{rules.message}</Text>
+                    )}
 
                     <TouchableOpacity
-                      style={styles.initiatePaymentButton}
+                      style={[
+                        styles.initiatePaymentButton,
+                        submitting && styles.disabledButton,
+                      ]}
                       onPress={handleSubmitPayment}
                       disabled={submitting}
                     >
@@ -689,11 +843,22 @@ const Payments = () => {
                           : "Enter amount"}
                       </Text>
                     </View>
+                    {validationErrors.amount && (
+                      <Text style={styles.errorText}>
+                        {validationErrors.amount}
+                      </Text>
+                    )}
 
                     <Text style={styles.inputLabel}>
-                      Transaction Reference *
+                      Transaction Reference *{" "}
+                      {rules && `(${rules.minLength}-${rules.maxLength} chars)`}
                     </Text>
-                    <View style={styles.inputContainer}>
+                    <View
+                      style={[
+                        styles.inputContainer,
+                        validationErrors.reference_code && styles.inputError,
+                      ]}
+                    >
                       <MaterialIcons
                         name="receipt"
                         size={20}
@@ -702,15 +867,29 @@ const Payments = () => {
                       />
                       <TextInput
                         style={styles.input}
-                        placeholder="Enter transaction reference"
+                        placeholder={
+                          rules?.example || "Enter transaction reference"
+                        }
                         placeholderTextColor="#999"
                         value={paymentForm.reference_code}
                         onChangeText={handleReferenceChange}
+                        maxLength={rules?.maxLength}
                       />
                     </View>
+                    {validationErrors.reference_code && (
+                      <Text style={styles.errorText}>
+                        {validationErrors.reference_code}
+                      </Text>
+                    )}
+                    {rules && (
+                      <Text style={styles.hintText}>{rules.message}</Text>
+                    )}
 
                     <TouchableOpacity
-                      style={styles.initiatePaymentButton}
+                      style={[
+                        styles.initiatePaymentButton,
+                        submitting && styles.disabledButton,
+                      ]}
                       onPress={handleSubmitPayment}
                       disabled={submitting}
                     >
@@ -746,13 +925,16 @@ const Payments = () => {
     paymentForm.phoneNumber,
     paymentForm.reference_code,
     submitting,
+    validationErrors,
     handleSubmitPayment,
     handlePhoneChange,
     handleReferenceChange,
+    handleAmountChange,
     copyToClipboard,
     bankDetails,
     formatCurrency,
     dismissKeyboard,
+    referenceCodeRules,
   ]);
 
   const successModalContent = useMemo(() => {
@@ -1284,6 +1466,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e0e0e0",
   },
+  inputError: {
+    borderColor: "#F44336",
+    borderWidth: 1,
+  },
   inputIcon: {
     marginRight: 10,
   },
@@ -1301,12 +1487,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
   },
+  errorText: {
+    color: "#F44336",
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 5,
+  },
+  hintText: {
+    color: "#666",
+    fontSize: 11,
+    marginTop: 4,
+    marginLeft: 5,
+    fontStyle: "italic",
+  },
   initiatePaymentButton: {
     backgroundColor: "#2E7D32",
     borderRadius: 10,
     padding: 15,
     alignItems: "center",
     marginTop: 20,
+  },
+  disabledButton: {
+    backgroundColor: "#cccccc",
   },
   initiatePaymentText: {
     color: "#ffffff",

@@ -838,7 +838,7 @@ function MessagesScreen({ onBack, onSelectRole }) {
     },
     {
       id: "engineer",
-      name: "Engineer",
+      name: "Landscaper",
       icon: "construct-outline",
       color: "#81C784",
       description: "Technical consultation and project execution",
@@ -1017,7 +1017,7 @@ function EngineerListScreen({ onBack, onSelectEngineer }) {
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <Ionicons name="arrow-back" size={24} color="#2E7D32" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Select Engineer</Text>
+        <Text style={styles.headerTitle}>Select Landscaper</Text>
         <TouchableOpacity
           style={styles.refreshButton}
           onPress={() => loadUserAndEngineers()}
@@ -1030,7 +1030,7 @@ function EngineerListScreen({ onBack, onSelectEngineer }) {
         <Ionicons name="search" size={20} color="#64748b" />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search engineers by name or specialty..."
+          placeholder="Search landscapers by name or specialty..."
           value={searchQuery}
           onChangeText={setSearchQuery}
         />

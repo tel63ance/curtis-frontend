@@ -44,6 +44,9 @@ const ServiceHistory = ({ customerId }) => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [generatingPDF, setGeneratingPDF] = useState(false);
 
+  // Track confirmed bookings
+  const [confirmedBookings, setConfirmedBookings] = useState([]);
+
   // Filter states
   const [filters, setFilters] = useState({
     status: "",
@@ -293,8 +296,7 @@ const ServiceHistory = ({ customerId }) => {
       return;
     }
 
-    // If there are multiple payments, you might want to let the user choose
-    // For now, we'll show the most recent one
+    // If there are multiple payments, show the most recent one
     const latestPayment = approvedPayments.sort(
       (a, b) =>
         new Date(b.paid_at || b.created_at) -
@@ -306,6 +308,22 @@ const ServiceHistory = ({ customerId }) => {
       booking: booking,
     });
     setReceiptModalVisible(true);
+  };
+
+  const handleConfirmCompletion = (booking) => {
+    // Add booking to confirmed list
+    setConfirmedBookings((prev) => [...prev, booking.booking_id]);
+
+    // Show success message
+    Alert.alert(
+      "Service Completed",
+      `Thank you for confirming that the ${booking.service_type} service has been completed. We hope you're satisfied with our work!`,
+      [{ text: "OK" }],
+    );
+  };
+
+  const isBookingConfirmed = (bookingId) => {
+    return confirmedBookings.includes(bookingId);
   };
 
   const generateReceiptHTML = (payment, booking) => {
@@ -323,6 +341,18 @@ const ServiceHistory = ({ customerId }) => {
       payment.payment_type === "booking_fee"
         ? "Booking Fee"
         : "Service Payment (Valuation)";
+
+    // Calculate total amount paid
+    let totalPaid = payment.amount;
+    let displayBreakdown = false;
+
+    // For normal payments, the total should include both booking fee and valuation amount
+    if (payment.payment_type === "normal_payment" && booking.valuation_amount) {
+      totalPaid = (
+        parseFloat(booking.booking_fee) + parseFloat(booking.valuation_amount)
+      ).toFixed(2);
+      displayBreakdown = true;
+    }
 
     return `
       <!DOCTYPE html>
@@ -416,6 +446,23 @@ const ServiceHistory = ({ customerId }) => {
               color: #333;
               width: 60%;
               text-align: right;
+            }
+            .breakdown-section {
+              background-color: #f8f9fa;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 15px 0;
+            }
+            .breakdown-title {
+              font-size: 16px;
+              font-weight: bold;
+              color: #333;
+              margin-bottom: 10px;
+            }
+            .breakdown-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 5px 0;
             }
             .payment-status {
               margin-top: 20px;
@@ -528,24 +575,32 @@ const ServiceHistory = ({ customerId }) => {
                     day: "numeric",
                   })}</span>
                 </div>
+                
                 ${
-                  booking.valuation_amount &&
-                  payment.payment_type === "normal_payment"
+                  displayBreakdown
                     ? `
-                <div class="detail-row">
-                  <span class="detail-label">Booking Fee:</span>
-                  <span class="detail-value">${formatCurrency(booking.booking_fee)}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Valuation Amount:</span>
-                  <span class="detail-value">${formatCurrency(booking.valuation_amount)}</span>
-                </div>
+                  <div class="breakdown-section">
+                    <div class="breakdown-title">Payment Breakdown</div>
+                    <div class="breakdown-row">
+                      <span>Booking Fee:</span>
+                      <span>${formatCurrency(booking.booking_fee)}</span>
+                    </div>
+                    <div class="breakdown-row">
+                      <span>Valuation Amount:</span>
+                      <span>${formatCurrency(booking.valuation_amount)}</span>
+                    </div>
+                    <div class="breakdown-row" style="border-top: 2px solid #e0e0e0; margin-top: 10px; padding-top: 10px; font-weight: bold;">
+                      <span>Total Service Cost:</span>
+                      <span>${formatCurrency(totalPaid)}</span>
+                    </div>
+                  </div>
                 `
                     : ""
                 }
+                
                 <div class="detail-row" style="border-bottom: 2px solid #e0e0e0; margin-top: 10px;">
                   <span class="detail-label" style="font-size: 18px;">TOTAL PAID:</span>
-                  <span class="detail-value amount-highlight">${formatCurrency(payment.amount)}</span>
+                  <span class="detail-value amount-highlight">${formatCurrency(totalPaid)}</span>
                 </div>
               </div>
               
@@ -702,6 +757,7 @@ const ServiceHistory = ({ customerId }) => {
         !item.normal_payment_paid);
 
     const hasApprovedPayment = checkPaymentApproved(item);
+    const confirmed = isBookingConfirmed(item.booking_id);
 
     return (
       <TouchableOpacity
@@ -796,6 +852,32 @@ const ServiceHistory = ({ customerId }) => {
             >
               <Ionicons name="document-text-outline" size={18} color="#fff" />
               <Text style={styles.actionButtonText}>View Receipt</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Confirm Completion Button for completed bookings - disabled after click */}
+          {item.status === "completed" && (
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                styles.confirmButton,
+                confirmed && styles.confirmedButton,
+              ]}
+              onPress={() => handleConfirmCompletion(item)}
+              disabled={confirmed}
+            >
+              <Ionicons
+                name={
+                  confirmed
+                    ? "checkmark-done-circle"
+                    : "checkmark-done-circle-outline"
+                }
+                size={18}
+                color="#fff"
+              />
+              <Text style={styles.actionButtonText}>
+                {confirmed ? "Confirmed" : "Confirm Completion"}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -992,6 +1074,38 @@ const ServiceHistory = ({ customerId }) => {
                       </Text>
                     </TouchableOpacity>
                   )}
+
+                  {/* Confirm Completion Button in modal - disabled after click */}
+                  {selectedBooking.status === "completed" && (
+                    <TouchableOpacity
+                      style={[
+                        styles.modalActionButton,
+                        styles.modalConfirmButton,
+                        isBookingConfirmed(selectedBooking.booking_id) &&
+                          styles.modalConfirmedButton,
+                      ]}
+                      onPress={() => {
+                        handleConfirmCompletion(selectedBooking);
+                        setDetailsModalVisible(false);
+                      }}
+                      disabled={isBookingConfirmed(selectedBooking.booking_id)}
+                    >
+                      <Ionicons
+                        name={
+                          isBookingConfirmed(selectedBooking.booking_id)
+                            ? "checkmark-done-circle"
+                            : "checkmark-done-circle-outline"
+                        }
+                        size={20}
+                        color="#fff"
+                      />
+                      <Text style={styles.modalActionButtonText}>
+                        {isBookingConfirmed(selectedBooking.booking_id)
+                          ? "Confirmed"
+                          : "Confirm Completion"}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
             </ScrollView>
@@ -1159,6 +1273,27 @@ const ServiceHistory = ({ customerId }) => {
                             <Text style={styles.receiptDetailValue}>
                               {formatCurrency(
                                 selectedPayment.booking.valuation_amount,
+                              )}
+                            </Text>
+                          </View>
+                          {/* Add total calculation */}
+                          <View
+                            style={[
+                              styles.receiptDetailRow,
+                              styles.breakdownTotal,
+                            ]}
+                          >
+                            <Text style={styles.receiptTotalLabel}>
+                              Total Service Cost:
+                            </Text>
+                            <Text style={styles.receiptTotalValue}>
+                              {formatCurrency(
+                                parseFloat(
+                                  selectedPayment.booking.booking_fee,
+                                ) +
+                                  parseFloat(
+                                    selectedPayment.booking.valuation_amount,
+                                  ),
                               )}
                             </Text>
                           </View>
@@ -1844,6 +1979,13 @@ const styles = StyleSheet.create({
   receiptButton: {
     backgroundColor: "#2196f3",
   },
+  confirmButton: {
+    backgroundColor: "#8bc34a", // Light green color for confirmation
+  },
+  confirmedButton: {
+    backgroundColor: "#689f38", // Darker green when confirmed
+    opacity: 0.8,
+  },
   actionButtonText: {
     color: "#fff",
     fontSize: 14,
@@ -1924,6 +2066,17 @@ const styles = StyleSheet.create({
     padding: 20,
     maxHeight: "90%",
   },
+  breakdownTotal: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 2,
+    borderTopColor: "#333",
+    borderBottomWidth: 2,
+    borderBottomColor: "#333",
+    paddingBottom: 8,
+    marginBottom: 8,
+    backgroundColor: "#f8f9fa",
+  },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1989,6 +2142,13 @@ const styles = StyleSheet.create({
   },
   modalReceiptButton: {
     backgroundColor: "#2196f3",
+  },
+  modalConfirmButton: {
+    backgroundColor: "#8bc34a",
+  },
+  modalConfirmedButton: {
+    backgroundColor: "#689f38",
+    opacity: 0.8,
   },
   modalActionButtonText: {
     color: "#fff",

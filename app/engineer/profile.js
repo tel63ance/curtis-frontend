@@ -865,16 +865,7 @@ export default function EngineerProfile() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back-outline" size={24} color="#10b981" />
-        </TouchableOpacity>
         <Text style={styles.title}>Engineer Profile</Text>
-        <TouchableOpacity onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={24} color="#ef4444" />
-        </TouchableOpacity>
       </View>
 
       <ScrollView

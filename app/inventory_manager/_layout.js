@@ -30,6 +30,15 @@ export default function inventory_manager() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="requests"
+        options={{
+          title: "Requests",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="request-quote" size={size} color={color} />
+          ),
+        }}
+      />
 
       <Tabs.Screen
         name="profile"

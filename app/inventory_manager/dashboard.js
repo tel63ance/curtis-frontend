@@ -33,6 +33,206 @@ const PRODUCT_CATEGORIES = [
   "Accessories",
 ];
 
+// Predefined landscaping items that can be ordered
+const PREDEFINED_ITEMS = [
+  // Plants
+  { id: "p1", name: "Rose Bush", category: "Plants", defaultUnit: "pcs" },
+  { id: "p2", name: "Fern", category: "Plants", defaultUnit: "pcs" },
+  { id: "p3", name: "Palm Tree", category: "Plants", defaultUnit: "pcs" },
+  { id: "p4", name: "Bamboo", category: "Plants", defaultUnit: "pcs" },
+  { id: "p5", name: "Lavender", category: "Plants", defaultUnit: "pcs" },
+  { id: "p6", name: "Hedge Shrub", category: "Plants", defaultUnit: "pcs" },
+  {
+    id: "p7",
+    name: "Ornamental Grass",
+    category: "Plants",
+    defaultUnit: "pcs",
+  },
+  { id: "p8", name: "Succulents", category: "Plants", defaultUnit: "pcs" },
+  { id: "p9", name: "Hydrangea", category: "Plants", defaultUnit: "pcs" },
+  { id: "p10", name: "Azalea", category: "Plants", defaultUnit: "pcs" },
+  { id: "p11", name: "Boxwood", category: "Plants", defaultUnit: "pcs" },
+  { id: "p12", name: "Jasmine", category: "Plants", defaultUnit: "pcs" },
+
+  // Tools
+  { id: "t1", name: "Garden Shovel", category: "Tools", defaultUnit: "pcs" },
+  { id: "t2", name: "Pruning Shears", category: "Tools", defaultUnit: "pcs" },
+  { id: "t3", name: "Garden Rake", category: "Tools", defaultUnit: "pcs" },
+  { id: "t4", name: "Hoe", category: "Tools", defaultUnit: "pcs" },
+  { id: "t5", name: "Wheelbarrow", category: "Tools", defaultUnit: "pcs" },
+  { id: "t6", name: "Garden Fork", category: "Tools", defaultUnit: "pcs" },
+  { id: "t7", name: "Trowel", category: "Tools", defaultUnit: "pcs" },
+  { id: "t8", name: "Watering Can", category: "Tools", defaultUnit: "pcs" },
+  { id: "t9", name: "Hedge Trimmer", category: "Tools", defaultUnit: "pcs" },
+  { id: "t10", name: "Lawn Mower", category: "Tools", defaultUnit: "pcs" },
+  { id: "t11", name: "Leaf Blower", category: "Tools", defaultUnit: "pcs" },
+  { id: "t12", name: "Edger", category: "Tools", defaultUnit: "pcs" },
+  { id: "t13", name: "Chainsaw", category: "Tools", defaultUnit: "pcs" },
+  { id: "t14", name: "Pressure Washer", category: "Tools", defaultUnit: "pcs" },
+  { id: "t15", name: "Cultivator", category: "Tools", defaultUnit: "pcs" },
+
+  // Fertilizers
+  {
+    id: "f1",
+    name: "All-Purpose Fertilizer",
+    category: "Fertilizers",
+    defaultUnit: "kg",
+  },
+  {
+    id: "f2",
+    name: "Nitrogen Fertilizer",
+    category: "Fertilizers",
+    defaultUnit: "kg",
+  },
+  {
+    id: "f3",
+    name: "Phosphorus Fertilizer",
+    category: "Fertilizers",
+    defaultUnit: "kg",
+  },
+  {
+    id: "f4",
+    name: "Potassium Fertilizer",
+    category: "Fertilizers",
+    defaultUnit: "kg",
+  },
+  { id: "f5", name: "Compost", category: "Fertilizers", defaultUnit: "kg" },
+  { id: "f6", name: "Manure", category: "Fertilizers", defaultUnit: "kg" },
+  {
+    id: "f7",
+    name: "Liquid Fertilizer",
+    category: "Fertilizers",
+    defaultUnit: "L",
+  },
+  {
+    id: "f8",
+    name: "Slow-Release Fertilizer",
+    category: "Fertilizers",
+    defaultUnit: "kg",
+  },
+  { id: "f9", name: "Bone Meal", category: "Fertilizers", defaultUnit: "kg" },
+  { id: "f10", name: "Blood Meal", category: "Fertilizers", defaultUnit: "kg" },
+  {
+    id: "f11",
+    name: "Fish Emulsion",
+    category: "Fertilizers",
+    defaultUnit: "L",
+  },
+
+  // Pesticides
+  {
+    id: "pe1",
+    name: "Insecticide Spray",
+    category: "Pesticides",
+    defaultUnit: "L",
+  },
+  { id: "pe2", name: "Fungicide", category: "Pesticides", defaultUnit: "L" },
+  { id: "pe3", name: "Herbicide", category: "Pesticides", defaultUnit: "L" },
+  { id: "pe4", name: "Rodenticide", category: "Pesticides", defaultUnit: "kg" },
+  { id: "pe5", name: "Neem Oil", category: "Pesticides", defaultUnit: "L" },
+  {
+    id: "pe6",
+    name: "Pesticide Granules",
+    category: "Pesticides",
+    defaultUnit: "kg",
+  },
+  { id: "pe7", name: "Miticide", category: "Pesticides", defaultUnit: "L" },
+  { id: "pe8", name: "Slug Bait", category: "Pesticides", defaultUnit: "kg" },
+
+  // Soil
+  { id: "s1", name: "Potting Mix", category: "Soil", defaultUnit: "bags" },
+  { id: "s2", name: "Topsoil", category: "Soil", defaultUnit: "bags" },
+  { id: "s3", name: "Garden Soil", category: "Soil", defaultUnit: "bags" },
+  { id: "s4", name: "Peat Moss", category: "Soil", defaultUnit: "bags" },
+  { id: "s5", name: "Vermiculite", category: "Soil", defaultUnit: "bags" },
+  { id: "s6", name: "Perlite", category: "Soil", defaultUnit: "bags" },
+  { id: "s7", name: "Sand", category: "Soil", defaultUnit: "bags" },
+  { id: "s8", name: "Mulch", category: "Soil", defaultUnit: "bags" },
+  { id: "s9", name: "Coconut Coir", category: "Soil", defaultUnit: "bags" },
+  { id: "s10", name: "Compost", category: "Soil", defaultUnit: "bags" },
+
+  // Seeds
+  { id: "sd1", name: "Grass Seed", category: "Seeds", defaultUnit: "kg" },
+  { id: "sd2", name: "Flower Seed Mix", category: "Seeds", defaultUnit: "pcs" },
+  { id: "sd3", name: "Vegetable Seeds", category: "Seeds", defaultUnit: "pcs" },
+  { id: "sd4", name: "Tree Seeds", category: "Seeds", defaultUnit: "pcs" },
+  { id: "sd5", name: "Wildflower Seeds", category: "Seeds", defaultUnit: "kg" },
+  { id: "sd6", name: "Shrub Seeds", category: "Seeds", defaultUnit: "pcs" },
+  {
+    id: "sd7",
+    name: "Ground Cover Seeds",
+    category: "Seeds",
+    defaultUnit: "kg",
+  },
+
+  // Equipment
+  {
+    id: "e1",
+    name: "Irrigation System",
+    category: "Equipment",
+    defaultUnit: "pcs",
+  },
+  {
+    id: "e2",
+    name: "Sprinkler Head",
+    category: "Equipment",
+    defaultUnit: "pcs",
+  },
+  { id: "e3", name: "Garden Hose", category: "Equipment", defaultUnit: "pcs" },
+  { id: "e4", name: "Hose Reel", category: "Equipment", defaultUnit: "pcs" },
+  {
+    id: "e5",
+    name: "Drip Irrigation Kit",
+    category: "Equipment",
+    defaultUnit: "pcs",
+  },
+  { id: "e6", name: "Timer", category: "Equipment", defaultUnit: "pcs" },
+  { id: "e7", name: "Rain Barrel", category: "Equipment", defaultUnit: "pcs" },
+  { id: "e8", name: "Compost Bin", category: "Equipment", defaultUnit: "pcs" },
+
+  // Accessories
+  {
+    id: "a1",
+    name: "Garden Gloves",
+    category: "Accessories",
+    defaultUnit: "pairs",
+  },
+  { id: "a2", name: "Knee Pad", category: "Accessories", defaultUnit: "pcs" },
+  { id: "a3", name: "Plant Pot", category: "Accessories", defaultUnit: "pcs" },
+  {
+    id: "a4",
+    name: "Plant Stand",
+    category: "Accessories",
+    defaultUnit: "pcs",
+  },
+  {
+    id: "a5",
+    name: "Garden Stakes",
+    category: "Accessories",
+    defaultUnit: "pcs",
+  },
+  {
+    id: "a6",
+    name: "Plant Labels",
+    category: "Accessories",
+    defaultUnit: "pcs",
+  },
+  { id: "a7", name: "Twine", category: "Accessories", defaultUnit: "pcs" },
+  {
+    id: "a8",
+    name: "Garden Netting",
+    category: "Accessories",
+    defaultUnit: "pcs",
+  },
+  { id: "a9", name: "Plant Ties", category: "Accessories", defaultUnit: "pcs" },
+  {
+    id: "a10",
+    name: "Garden Decor",
+    category: "Accessories",
+    defaultUnit: "pcs",
+  },
+];
+
 // Supply statuses and their colors
 const SUPPLY_STATUSES = {
   pending: { color: "#f59e0b", label: "Pending", icon: "time-outline" },
@@ -380,6 +580,12 @@ export default function InventoryDashboard() {
     min_stock: "",
   });
 
+  // Item dropdown state
+  const [showItemDropdown, setShowItemDropdown] = useState(false);
+  const [itemSearchQuery, setItemSearchQuery] = useState("");
+  const [filteredPredefinedItems, setFilteredPredefinedItems] =
+    useState(PREDEFINED_ITEMS);
+
   // Date picker state
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -455,6 +661,21 @@ export default function InventoryDashboard() {
 
     setFilteredSupplies(filtered);
   }, [supplies, supplySearchQuery, selectedSupplyStatus]);
+
+  // Filter predefined items based on search
+  useEffect(() => {
+    if (itemSearchQuery.trim() === "") {
+      setFilteredPredefinedItems(PREDEFINED_ITEMS);
+    } else {
+      const query = itemSearchQuery.toLowerCase();
+      const filtered = PREDEFINED_ITEMS.filter(
+        (item) =>
+          item.name.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query),
+      );
+      setFilteredPredefinedItems(filtered);
+    }
+  }, [itemSearchQuery]);
 
   const loadUserData = async () => {
     try {
@@ -794,12 +1015,25 @@ export default function InventoryDashboard() {
       min_stock: "",
     });
     setSelectedSupplier(null);
+    setItemSearchQuery("");
+    setShowItemDropdown(false);
     setRequestNewItemModal(true);
+  };
+
+  const handleSelectPredefinedItem = (item) => {
+    setNewItemRequest({
+      ...newItemRequest,
+      item_name: item.name,
+      category: item.category,
+      unit: item.defaultUnit,
+    });
+    setShowItemDropdown(false);
+    setItemSearchQuery("");
   };
 
   const handleCreateSupplyRequest = async () => {
     if (!newItemRequest.item_name.trim()) {
-      Alert.alert("Error", "Please enter item name");
+      Alert.alert("Error", "Please select an item");
       return;
     }
     if (!newItemRequest.quantity || parseInt(newItemRequest.quantity) <= 0) {
@@ -1754,46 +1988,156 @@ export default function InventoryDashboard() {
           >
             <Text style={styles.modalSectionTitle}>Item Details</Text>
 
-            <Text style={styles.modalLabel}>Item Name *</Text>
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Enter item name"
-              value={newItemRequest.item_name}
-              onChangeText={(text) =>
-                setNewItemRequest({ ...newItemRequest, item_name: text })
-              }
-            />
-
-            <Text style={styles.modalLabel}>Category *</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.categoryPicker}
+            {/* Item Selection Dropdown */}
+            <Text style={styles.modalLabel}>Select Item *</Text>
+            <TouchableOpacity
+              style={styles.dropdownButton}
+              onPress={() => setShowItemDropdown(!showItemDropdown)}
             >
-              {PRODUCT_CATEGORIES.map((category) => (
-                <TouchableOpacity
-                  key={category}
-                  style={[
-                    styles.categoryChip,
-                    newItemRequest.category === category &&
-                      styles.selectedCategoryChip,
-                  ]}
-                  onPress={() =>
-                    setNewItemRequest({ ...newItemRequest, category })
-                  }
+              <Text
+                style={
+                  newItemRequest.item_name
+                    ? styles.dropdownButtonText
+                    : styles.dropdownPlaceholder
+                }
+              >
+                {newItemRequest.item_name ||
+                  "Choose a landscaping item to order"}
+              </Text>
+              <Ionicons
+                name={showItemDropdown ? "chevron-up" : "chevron-down"}
+                size={20}
+                color="#64748b"
+              />
+            </TouchableOpacity>
+
+            {/* Item Dropdown List */}
+            {showItemDropdown && (
+              <View style={styles.dropdownList}>
+                <View style={styles.dropdownSearch}>
+                  <Ionicons name="search" size={16} color="#94a3b8" />
+                  <TextInput
+                    style={styles.dropdownSearchInput}
+                    placeholder="Search items by name or category..."
+                    placeholderTextColor="#94a3b8"
+                    value={itemSearchQuery}
+                    onChangeText={setItemSearchQuery}
+                    autoFocus
+                  />
+                  {itemSearchQuery.length > 0 && (
+                    <TouchableOpacity onPress={() => setItemSearchQuery("")}>
+                      <Ionicons name="close-circle" size={16} color="#94a3b8" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {/* Category quick filters */}
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.dropdownCategories}
                 >
-                  <Text
-                    style={[
-                      styles.categoryChipText,
-                      newItemRequest.category === category &&
-                        styles.selectedCategoryChipText,
-                    ]}
+                  <TouchableOpacity
+                    style={styles.dropdownCategoryChip}
+                    onPress={() => setItemSearchQuery("")}
                   >
-                    {category}
+                    <Text style={styles.dropdownCategoryText}>All</Text>
+                  </TouchableOpacity>
+                  {PRODUCT_CATEGORIES.map((cat) => (
+                    <TouchableOpacity
+                      key={cat}
+                      style={styles.dropdownCategoryChip}
+                      onPress={() => setItemSearchQuery(cat)}
+                    >
+                      <Text style={styles.dropdownCategoryText}>{cat}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+
+                <ScrollView
+                  style={styles.dropdownItems}
+                  nestedScrollEnabled={true}
+                >
+                  {filteredPredefinedItems.length > 0 ? (
+                    filteredPredefinedItems.map((item) => (
+                      <TouchableOpacity
+                        key={item.id}
+                        style={styles.dropdownItem}
+                        onPress={() => handleSelectPredefinedItem(item)}
+                      >
+                        <View style={styles.dropdownItemContent}>
+                          <Text style={styles.dropdownItemName}>
+                            {item.name}
+                          </Text>
+                          <View style={styles.dropdownItemDetails}>
+                            <Text style={styles.dropdownItemCategory}>
+                              {item.category}
+                            </Text>
+                            <Text style={styles.dropdownItemUnit}>
+                              Default: {item.defaultUnit}
+                            </Text>
+                          </View>
+                        </View>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={16}
+                          color="#cbd5e1"
+                        />
+                      </TouchableOpacity>
+                    ))
+                  ) : (
+                    <View style={styles.dropdownEmptyContainer}>
+                      <Ionicons
+                        name="search-outline"
+                        size={32}
+                        color="#cbd5e1"
+                      />
+                      <Text style={styles.dropdownEmptyText}>
+                        No items found
+                      </Text>
+                      <Text style={styles.dropdownEmptySubtext}>
+                        Try a different search term or category
+                      </Text>
+                    </View>
+                  )}
+                </ScrollView>
+              </View>
+            )}
+
+            {/* Show selected item summary */}
+            {newItemRequest.item_name && !showItemDropdown && (
+              <View style={styles.selectedItemSummary}>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Selected Item:</Text>
+                  <Text style={styles.summaryValue}>
+                    {newItemRequest.item_name}
                   </Text>
+                </View>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Category:</Text>
+                  <Text style={styles.summaryValue}>
+                    {newItemRequest.category}
+                  </Text>
+                </View>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Default Unit:</Text>
+                  <Text style={styles.summaryValue}>{newItemRequest.unit}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.changeItemButton}
+                  onPress={() => {
+                    setShowItemDropdown(true);
+                    setNewItemRequest({
+                      ...newItemRequest,
+                      item_name: "",
+                    });
+                  }}
+                >
+                  <Ionicons name="refresh-outline" size={14} color="#2E7D32" />
+                  <Text style={styles.changeItemText}>Change Item</Text>
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
+              </View>
+            )}
 
             <View style={styles.row}>
               <View style={styles.halfWidth}>
@@ -2969,5 +3313,155 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "white",
+  },
+  // Dropdown Styles
+  dropdownButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f8fafc",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    marginBottom: 8,
+  },
+  dropdownButtonText: {
+    fontSize: 14,
+    color: "#1e293b",
+    flex: 1,
+  },
+  dropdownPlaceholder: {
+    fontSize: 14,
+    color: "#94a3b8",
+    flex: 1,
+  },
+  dropdownList: {
+    backgroundColor: "white",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    marginBottom: 16,
+    maxHeight: 400,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  dropdownSearch: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+    backgroundColor: "#f8fafc",
+  },
+  dropdownSearchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#1e293b",
+    padding: 0,
+  },
+  dropdownCategories: {
+    flexDirection: "row",
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  dropdownCategoryChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    backgroundColor: "#f1f5f9",
+    borderRadius: 16,
+    marginRight: 6,
+  },
+  dropdownCategoryText: {
+    fontSize: 11,
+    color: "#64748b",
+    fontWeight: "500",
+  },
+  dropdownItems: {
+    maxHeight: 250,
+  },
+  dropdownItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f1f5f9",
+  },
+  dropdownItemContent: {
+    flex: 1,
+  },
+  dropdownItemName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1e293b",
+    marginBottom: 4,
+  },
+  dropdownItemDetails: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  dropdownItemCategory: {
+    fontSize: 11,
+    color: "#64748b",
+    backgroundColor: "#f1f5f9",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  dropdownItemUnit: {
+    fontSize: 11,
+    color: "#64748b",
+  },
+  dropdownEmptyContainer: {
+    padding: 20,
+    alignItems: "center",
+  },
+  dropdownEmptyText: {
+    fontSize: 14,
+    color: "#64748b",
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  dropdownEmptySubtext: {
+    fontSize: 12,
+    color: "#94a3b8",
+    textAlign: "center",
+  },
+  selectedItemSummary: {
+    backgroundColor: "#f8fafc",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    gap: 8,
+  },
+  summaryLabel: {
+    fontSize: 13,
+    color: "#64748b",
+  },
+  summaryValue: {
+    fontSize: 13,
+    color: "#1e293b",
+    fontWeight: "500",
+  },
+  changeItemButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+    paddingVertical: 8,
+    gap: 4,
+  },
+  changeItemText: {
+    fontSize: 12,
+    color: "#2E7D32",
+    fontWeight: "600",
   },
 });
